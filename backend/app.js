@@ -3,6 +3,7 @@ const ErrorHandler = require("./middleware/error");
 const app = express();
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
+const user = require("./controller/user");
 
 app.use(express.json());
 app.use(cookieParser());
@@ -15,6 +16,8 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
     path: "config/.env",
   });
 }
+
+app.use("/api/v2/user", user);
 
 // it's for ErrorHandling
 app.use(ErrorHandler);
