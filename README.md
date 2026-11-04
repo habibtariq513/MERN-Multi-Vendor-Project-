@@ -1,12 +1,26 @@
 # MERN Multi-Vendor Project
 
-## Login frontend
+## Project structure
 
-The login page is available at `/login`.
+- `frontend/` contains the React, Vite, and Tailwind CSS application.
+- `backend/` contains the Express API and MongoDB setup.
 
-Install dependencies and start the development server:
+## Run the frontend
 
 ```sh
+cd frontend
+npm install
+npm run dev
+```
+
+The login and signup pages are available at `/login` and `/sign-up`.
+
+## Run the backend
+
+Set the required values in `backend/config/.env`, then run:
+
+```sh
+cd backend
 npm install
 npm run dev
 ```
