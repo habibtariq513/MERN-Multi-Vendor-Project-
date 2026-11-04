@@ -1,0 +1,24 @@
+{
+  "name": "mern-multi-vendor-project",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "latest",
+    "react-dom": "latest",
+    "react-icons": "latest",
+    "react-router-dom": "latest"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "latest",
+    "autoprefixer": "latest",
+    "postcss": "latest",
+    "tailwindcss": "3.4.17",
+    "vite": "latest"
+  }
+}
