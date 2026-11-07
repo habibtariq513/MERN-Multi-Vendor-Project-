@@ -3,6 +3,8 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import styles from "../../styles/styles.js";
 import { Link } from "react-router-dom";
 import { RxAvatar } from "react-icons/rx";
+import axios from "axios";
+import { server } from "../../server.js";
 
 const Singup = () => {
   const [email, setEmail] = useState("");
@@ -10,14 +12,46 @@ const Singup = () => {
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
   const [avatar, setAvatar] = useState(null);
-
-  const handleSubmit = () => {
-    console.log("fff");
-  };
+  const [error, setError] = useState("");
 
   const handleFileInputChange = (e) => {
     const file = e.target.files[0];
     setAvatar(file);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (!avatar) {
+      setError("Please upload an avatar.");
+      return;
+    }
+
+    const newForm = new FormData();
+    newForm.append("file", avatar);
+    newForm.append("name", name);
+    newForm.append("email", email);
+    newForm.append("password", password);
+
+    try {
+      const response = await axios.post(
+        `${server}/user/create-user`,
+        newForm
+      );
+      window.alert(response.data.message);
+      setName("");
+      setEmail("");
+      setPassword("");
+      setAvatar(null);
+      const fileInput = document.getElementById("file-input");
+      if (fileInput) fileInput.value = "";
+    } catch (requestError) {
+      setError(
+        requestError.response?.data?.message ||
+          "Unable to submit registration. Please try again."
+      );
+    }
   };
 
   return (
@@ -29,7 +63,7 @@ const Singup = () => {
       </div>
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label
                 htmlFor="email"
@@ -130,6 +164,7 @@ const Singup = () => {
                     name="avatar"
                     id="file-input"
                     accept=".jpg,.jpeg,.png"
+                    required
                     onChange={handleFileInputChange}
                     className="sr-only"
                   />
@@ -138,6 +173,11 @@ const Singup = () => {
             </div>
 
             <div>
+              {error && (
+                <p className="text-sm text-red-600" role="alert">
+                  {error}
+                </p>
+              )}
               <button
                 type="submit"
                 className="group relative w-full h-[40px] flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"

@@ -55,7 +55,10 @@ router.post(
       };
 
       const activationToken = createActivationToken(user);
-      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+      const frontendUrl =
+        req.get("origin") ||
+        process.env.FRONTEND_URL ||
+        "http://localhost:5173";
       const activationUrl = `${frontendUrl}/activation/${activationToken}`;
 
       try {
