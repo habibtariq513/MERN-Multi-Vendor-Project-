@@ -13,6 +13,7 @@ const Singup = () => {
   const [visible, setVisible] = useState(false);
   const [avatar, setAvatar] = useState(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleFileInputChange = (e) => {
     const file = e.target.files[0];
@@ -21,6 +22,7 @@ const Singup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
     setError("");
 
     if (!avatar) {
@@ -34,6 +36,7 @@ const Singup = () => {
     newForm.append("email", email);
     newForm.append("password", password);
 
+    setLoading(true);
     try {
       const response = await axios.post(
         `${server}/user/create-user`,
@@ -51,6 +54,8 @@ const Singup = () => {
         requestError.response?.data?.message ||
           "Unable to submit registration. Please try again."
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -180,9 +185,17 @@ const Singup = () => {
               )}
               <button
                 type="submit"
-                className="group relative w-full h-[40px] flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                disabled={loading}
+                aria-busy={loading}
+                className="group relative w-full h-[40px] flex items-center justify-center gap-2 py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                Submit
+                {loading && (
+                  <span
+                    className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+                    aria-hidden="true"
+                  />
+                )}
+                <span>{loading ? "Signing up..." : "Submit"}</span>
               </button>
             </div>
             <div className={`${styles.noramlFlex} w-full`}>

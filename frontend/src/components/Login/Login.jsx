@@ -6,9 +6,15 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    if (loading) return;
+
+    setLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 900));
+    setLoading(false);
   };
 
   return (
@@ -104,9 +110,17 @@ function Login() {
             <div>
               <button
                 type="submit"
-                className="group relative w-full h-[40px] flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                disabled={loading}
+                aria-busy={loading}
+                className="group relative w-full h-[40px] flex items-center justify-center gap-2 py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                Submit
+                {loading && (
+                  <span
+                    className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+                    aria-hidden="true"
+                  />
+                )}
+                <span>{loading ? "Logging in..." : "Submit"}</span>
               </button>
             </div>
           </form>
