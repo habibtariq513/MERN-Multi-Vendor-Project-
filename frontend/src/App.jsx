@@ -1,9 +1,10 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import { ActivationPage, LoginPage, SignupPage } from "./Routes.js";
+import { ActivationPage, HomePage, LoginPage, SignupPage } from "./Routes.js";
 
 function App() {
   return (
     <Routes>
+      <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/sign-up" element={<SignupPage />} />
       <Route
