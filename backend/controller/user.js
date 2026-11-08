@@ -12,6 +12,30 @@ const sendMail = require("../utils/sendMail");
 const sendToken = require("../utils/jwtToken");
 
 router.post(
+  "/login-user",
+  catchAsyncErrors(async (req, res, next) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return next(new ErrorHandler("Please provide your email and password", 400));
+    }
+
+    const user = await User.findOne({ email }).select("+password");
+
+    if (!user) {
+      return next(new ErrorHandler("Invalid email or password", 401));
+    }
+
+    const passwordMatches = await user.comparePassword(password);
+    if (!passwordMatches) {
+      return next(new ErrorHandler("Invalid email or password", 401));
+    }
+
+    return sendToken(user, 200, res);
+  })
+);
+
+router.post(
   "/create-user",
   upload.fields([
     { name: "file", maxCount: 1 },
@@ -22,36 +46,34 @@ router.post(
       const { name, email, password } = req.body;
       const uploadedFile = req.files?.file?.[0] || req.files?.avatar?.[0];
 
-      if (!uploadedFile) {
-        return next(new ErrorHandler("Please upload an avatar", 400));
-      }
-
       const userEmail = await User.findOne({ email });
 
       if (userEmail) {
-        const filename = path.basename(uploadedFile.filename);
-        const filePath = path.join(__dirname, "../uploads", filename);
-        fs.unlink(filePath, (err) => {
-          if (err) {
-            console.log(err);
-            return next(new ErrorHandler("Error deleting file", 500));
-          }
-          return next(new ErrorHandler("User already exists", 400));
-        });
-        return;
+        if (uploadedFile) {
+          const filename = path.basename(uploadedFile.filename);
+          const filePath = path.join(__dirname, "../uploads", filename);
+          fs.unlink(filePath, (err) => {
+            if (err) {
+              console.log(err);
+              return next(new ErrorHandler("Error deleting file", 500));
+            }
+            return next(new ErrorHandler("User already exists", 400));
+          });
+          return;
+        }
+        return next(new ErrorHandler("User already exists", 400));
       }
-
-      const filename = path.basename(uploadedFile.filename);
-      const fileUrl = path.join(filename);
 
       const user = {
         name,
         email,
         password: await bcrypt.hash(password, 10),
-        avatar: {
-          public_id: filename,
-          url: fileUrl,
-        },
+        ...(uploadedFile && {
+          avatar: {
+            public_id: path.basename(uploadedFile.filename),
+            url: path.basename(uploadedFile.filename),
+          },
+        }),
       };
 
       const activationToken = createActivationToken(user);

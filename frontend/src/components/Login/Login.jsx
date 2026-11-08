@@ -1,20 +1,38 @@
 import React, { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { server } from "../../server.js";
 
 function Login() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (loading) return;
 
+    setError("");
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 900));
-    setLoading(false);
+    try {
+      await axios.post(
+        `${server}/user/login-user`,
+        { email, password },
+        { withCredentials: true }
+      );
+      navigate("/");
+    } catch (requestError) {
+      setError(
+        requestError.response?.data?.message ||
+          "Unable to log in. Check that the backend is running and try again."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -108,6 +126,11 @@ function Login() {
             </div>
 
             <div>
+              {error && (
+                <p className="mb-2 text-sm text-red-600" role="alert">
+                  {error}
+                </p>
+              )}
               <button
                 type="submit"
                 disabled={loading}

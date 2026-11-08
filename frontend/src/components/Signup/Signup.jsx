@@ -25,13 +25,10 @@ const Singup = () => {
     if (loading) return;
     setError("");
 
-    if (!avatar) {
-      setError("Please upload an avatar.");
-      return;
-    }
-
     const newForm = new FormData();
-    newForm.append("file", avatar);
+    if (avatar) {
+      newForm.append("file", avatar);
+    }
     newForm.append("name", name);
     newForm.append("email", email);
     newForm.append("password", password);
@@ -169,7 +166,6 @@ const Singup = () => {
                     name="avatar"
                     id="file-input"
                     accept=".jpg,.jpeg,.png"
-                    required
                     onChange={handleFileInputChange}
                     className="sr-only"
                   />
