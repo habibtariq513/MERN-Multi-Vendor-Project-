@@ -16,19 +16,26 @@ const sendMail = async ({ email, subject, message }) => {
   const transporter = nodemailer.createTransport({
     host,
     port: Number(port),
-    service,
+    ...(service ? { service } : {}),
     auth: {
       user,
       pass: password,
     },
   });
 
-  await transporter.sendMail({
+  const info = await transporter.sendMail({
     from: user,
     to: email,
     subject,
     text: message,
   });
+
+  if (host === "smtp.ethereal.email") {
+    const previewUrl = nodemailer.getTestMessageUrl(info);
+    if (previewUrl) {
+      console.log(`Ethereal email preview: ${previewUrl}`);
+    }
+  }
 };
 
 module.exports = sendMail;

@@ -1,3 +1,6 @@
+import React from "react";
+import { FiHeadphones, FiRefreshCw, FiTruck } from "react-icons/fi";
+
 // navigation Data
 export const navItems = [
   {
@@ -22,25 +25,56 @@ export const navItems = [
   },
 ];
 
+export const brandingData = [
+  {
+    id: 1,
+    title: "Free Shipping",
+    Description: "Free shipping on orders over $100",
+    icon: React.createElement(FiTruck, { "aria-hidden": true, size: 32 }),
+  },
+  {
+    id: 2,
+    title: "Easy Returns",
+    Description: "30-day hassle-free returns",
+    icon: React.createElement(FiRefreshCw, { "aria-hidden": true, size: 32 }),
+  },
+  {
+    id: 3,
+    title: "Customer Support",
+    Description: "We're here to help, anytime",
+    icon: React.createElement(FiHeadphones, { "aria-hidden": true, size: 32 }),
+  },
+];
+
 export const categoriesData = [
   {
+    id: 1,
     title: "Electronics",
+    subTitle: "Gadgets and devices",
     image_Url: "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=80&h=80&fit=crop",
   },
   {
+    id: 2,
     title: "Fashion",
+    subTitle: "Clothing and accessories",
     image_Url: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=80&h=80&fit=crop",
   },
   {
+    id: 3,
     title: "Home & Living",
+    subTitle: "Make your home comfortable",
     image_Url: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=80&h=80&fit=crop",
   },
   {
+    id: 4,
     title: "Beauty",
+    subTitle: "Beauty and personal care",
     image_Url: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=80&h=80&fit=crop",
   },
   {
+    id: 5,
     title: "Sports",
+    subTitle: "Gear for active lifestyles",
     image_Url: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=80&h=80&fit=crop",
   },
 ];
