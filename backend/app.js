@@ -1,3 +1,14 @@
+const path = require("path");
+
+if (
+  process.env.NODE_ENV !== "PRODUCTION" &&
+  process.env.NODE_ENV !== "production"
+) {
+  require("dotenv").config({
+    path: path.join(__dirname, "config", ".env"),
+  });
+}
+
 const express = require("express");
 const ErrorHandler = require("./middleware/error");
 const app = express();
@@ -14,15 +25,8 @@ app.use(
     credentials: true,
   })
 );
-app.use("/", express.static("uploads"));
+app.use("/", express.static(path.join(__dirname, "uploads")));
 app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
-
-// config
-if (process.env.NODE_ENV !== "PRODUCTION") {
-  require("dotenv").config({
-    path: "config/.env",
-  });
-}
 
 app.use("/api/v2/user", user);
 
