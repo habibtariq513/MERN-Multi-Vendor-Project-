@@ -10,8 +10,8 @@ const Navbar = ({ active }) => {
         <div className="flex" key={item.url}>
           <Link
             className={`${
-              active === index + 1 ? "text-[#17dd1f]" : "text-[#fff]"
-            } cursor-pointer px-3 font-[500] lg:px-6`}
+              active === index + 1 ? "text-[#17dd1f]" : "text-[#000] 800px:text-[#fff]"
+            } cursor-pointer px-3 pb-[30px] 800px:pb-0 font-[500] lg:px-6`}
             to={item.url}
           >
             {item.title}

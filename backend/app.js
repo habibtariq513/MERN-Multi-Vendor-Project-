@@ -16,6 +16,7 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const user = require("./controller/user");
+const shop = require("./controller/shop");
 
 app.use(express.json());
 app.use(cookieParser());
@@ -29,6 +30,7 @@ app.use("/", express.static(path.join(__dirname, "uploads")));
 app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 
 app.use("/api/v2/user", user);
+app.use("/api/v2/shop", shop);
 
 // it's for ErrorHandling
 app.use(ErrorHandler);

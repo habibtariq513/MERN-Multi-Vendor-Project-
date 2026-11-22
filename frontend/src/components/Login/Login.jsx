@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { server } from "../../server.js";
-import { setAuthenticated } from "../../redux/store.js";
+import { setAuthenticated, setUser } from "../../redux/store.js";
 
 function Login() {
   const navigate = useNavigate();
@@ -22,12 +22,13 @@ function Login() {
     setError("");
     setLoading(true);
     try {
-      await axios.post(
+      const response = await axios.post(
         `${server}/user/login-user`,
         { email, password },
         { withCredentials: true }
       );
       dispatch(setAuthenticated(true));
+      dispatch(setUser(response.data.user));
       navigate("/");
       window.location.reload(true);
     } catch (requestError) {
