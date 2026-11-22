@@ -1,6 +1,10 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
+import SellerProtectedRoute from "./routes/SellerProtectedRoute.jsx";
+import store from "./redux/store.js";
+import { loadSeller } from "./redux/actions/seller.js";
 import {
   ActivationPage,
   BestSellingPage,
@@ -15,11 +19,16 @@ import {
   ShopCreatePage,
   SellerActivationPage,
   ShopLoginPage,
+  ShopHomePage,
   SignupPage,
 } from "./Routes.js";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    store.dispatch(loadSeller());
+  }, []);
 
   return (
     <Routes>
@@ -60,6 +69,14 @@ function App() {
         element={<SellerActivationPage />}
       />
       <Route path="/shop-login" element={<ShopLoginPage />} />
+      <Route
+        path="/shop/:id"
+        element={
+          <SellerProtectedRoute>
+            <ShopHomePage />
+          </SellerProtectedRoute>
+        }
+      />
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );

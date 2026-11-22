@@ -9,6 +9,7 @@ const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const ErrorHandler = require("../utils/ErrorHandler");
 const { upload } = require("../multer");
 const sendShopToken = require("../utils/shopToken");
+const { isSeller } = require("../middleware/auth");
 
 router.post("/create-shop", upload.single("file"), async (req, res, next) => {
   try {
@@ -140,6 +141,28 @@ router.post(
       }
 
       sendShopToken(user, 201, res);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+
+// load shop
+router.get(
+  "/getSeller",
+  isSeller,
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const seller = await Shop.findById(req.seller._id);
+
+      if (!seller) {
+        return next(new ErrorHandler("User doesn't exists", 400));
+      }
+
+      res.status(200).json({
+        success: true,
+        seller,
+      });
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
     }
