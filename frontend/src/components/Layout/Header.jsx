@@ -12,6 +12,8 @@ import { BiMenuAltLeft } from "react-icons/bi";
 import { CgProfile } from "react-icons/cg";
 import DropDown from "./DropDown.jsx";
 import Navbar from "./Navbar.jsx";
+import Cart from "../Cart/Cart.jsx";
+import Wishlist from "../Wishlist/Wishlist.jsx";
 
 const Header = ({ activeHeading }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -19,6 +21,8 @@ const Header = ({ activeHeading }) => {
   const [active, setActive] = useState(false);
   const [dropDown, setDropDown] = useState(false);
   const [logoFailed, setLogoFailed] = useState(false);
+  const [openCart, setOpenCart] = useState(false);
+  const [openWishlist, setOpenWishlist] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setActive(window.scrollY > 70);
@@ -109,18 +113,28 @@ const Header = ({ activeHeading }) => {
 
   const accountIcons = (
     <div className={`${styles.noramlFlex} justify-end gap-4 text-white`}>
-      <Link to="/wishlist" className="relative" aria-label="Wishlist">
+      <button
+        type="button"
+        className="relative"
+        aria-label="Wishlist"
+        onClick={() => setOpenWishlist(true)}
+      >
         <AiOutlineHeart size={30} color="rgb(255 255 255 / 83%)" />
         <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#3bc177] font-mono text-[12px] leading-tight text-white">
           0
         </span>
-      </Link>
-      <Link to="/cart" className="relative" aria-label="Shopping cart">
+      </button>
+      <button
+        type="button"
+        className="relative"
+        aria-label="Shopping cart"
+        onClick={() => setOpenCart(true)}
+      >
         <AiOutlineShoppingCart size={30} color="rgb(255 255 255 / 83%)" />
         <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#3bc177] font-mono text-[12px] leading-tight text-white">
           0
         </span>
-      </Link>
+      </button>
       <Link to="/login" aria-label="Sign in">
         <CgProfile size={30} color="rgb(255 255 255 / 83%)" />
       </Link>
@@ -151,6 +165,14 @@ const Header = ({ activeHeading }) => {
           </Link>
         </div>
       </div>
+
+      {/* cart popup */}
+      {openCart ? <Cart setOpenCart={setOpenCart} /> : null}
+
+      {/* wishlist popup */}
+      {openWishlist ? (
+        <Wishlist setOpenWishlist={setOpenWishlist} />
+      ) : null}
 
       <div
         className={`${

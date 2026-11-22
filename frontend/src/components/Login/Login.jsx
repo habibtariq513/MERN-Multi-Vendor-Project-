@@ -2,10 +2,13 @@ import React, { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useDispatch } from "react-redux";
 import { server } from "../../server.js";
+import { setAuthenticated } from "../../redux/store.js";
 
 function Login() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
@@ -24,7 +27,9 @@ function Login() {
         { email, password },
         { withCredentials: true }
       );
+      dispatch(setAuthenticated(true));
       navigate("/");
+      window.location.reload(true);
     } catch (requestError) {
       setError(
         requestError.response?.data?.message ||
