@@ -1,5 +1,6 @@
 import { configureStore, createSlice } from "@reduxjs/toolkit";
 import { sellerReducer } from "./reducers/seller.js";
+import { productReducer } from "./reducers/product.js";
 
 const userSlice = createSlice({
   name: "user",
@@ -35,6 +36,7 @@ const store = configureStore({
   reducer: {
     user: userSlice.reducer,
     seller: sellerReducer,
+    products: productReducer,
   },
 });
 
