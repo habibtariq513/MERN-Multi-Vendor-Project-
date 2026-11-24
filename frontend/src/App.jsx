@@ -21,7 +21,7 @@ import {
   ShopHomePage,
   SignupPage,
 } from "./Routes.js";
-import { ShopDashboardPage } from "./ShopRoutes.js";
+import { ShopCreateProductPage, ShopDashboardPage } from "./ShopRoutes.js";
 
 function App() {
   useEffect(() => {
@@ -80,6 +80,14 @@ function App() {
         element={
           <SellerProtectedRoute>
             <ShopDashboardPage />
+          </SellerProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard-create-product"
+        element={
+          <SellerProtectedRoute>
+            <ShopCreateProductPage />
           </SellerProtectedRoute>
         }
       />
