@@ -169,4 +169,18 @@ router.get(
   })
 );
 
+router.get(
+  "/logout",
+  catchAsyncErrors(async (req, res) => {
+    res.cookie("seller_token", null, {
+      expires: new Date(Date.now()),
+      httpOnly: true,
+    });
+    res.status(201).json({
+      success: true,
+      message: "Log out successful!",
+    });
+  })
+);
+
 module.exports = router;

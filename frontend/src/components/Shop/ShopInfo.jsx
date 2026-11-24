@@ -1,14 +1,28 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "../../styles/styles.js";
-import { backend_url } from "../../server.js";
+import { backend_url, server } from "../../server.js";
+import { toast } from "react-toastify";
 
 const ShopInfo = ({ isOwner }) => {
   const { seller } = useSelector((state) => state.seller);
   const avatar = seller?.avatar?.url || seller?.avatar;
+  const navigate = useNavigate();
 
-  const logoutHandler = async () => {};
+  const logoutHandler = async () => {
+    try {
+      const { data } = await axios.get(`${server}/shop/logout`, {
+        withCredentials: true,
+      });
+      toast.success(data.message);
+      navigate("/shop-login");
+      window.location.reload();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Unable to log out");
+    }
+  };
 
   return (
     <>

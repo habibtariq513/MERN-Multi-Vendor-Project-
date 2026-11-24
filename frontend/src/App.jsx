@@ -21,7 +21,11 @@ import {
   ShopHomePage,
   SignupPage,
 } from "./Routes.js";
-import { ShopCreateProductPage, ShopDashboardPage } from "./ShopRoutes.js";
+import {
+  ShopAllProductsPage,
+  ShopCreateProductPage,
+  ShopDashboardPage,
+} from "./ShopRoutes.js";
 
 function App() {
   useEffect(() => {
@@ -88,6 +92,14 @@ function App() {
         element={
           <SellerProtectedRoute>
             <ShopCreateProductPage />
+          </SellerProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard-products"
+        element={
+          <SellerProtectedRoute>
+            <ShopAllProductsPage />
           </SellerProtectedRoute>
         }
       />
