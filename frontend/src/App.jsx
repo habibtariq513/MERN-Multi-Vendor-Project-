@@ -23,7 +23,9 @@ import {
 } from "./Routes.js";
 import {
   ShopAllProductsPage,
+  ShopAllEventsPage,
   ShopCreateProductPage,
+  ShopCreateEventsPage,
   ShopDashboardPage,
 } from "./ShopRoutes.js";
 
@@ -100,6 +102,22 @@ function App() {
         element={
           <SellerProtectedRoute>
             <ShopAllProductsPage />
+          </SellerProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard-create-event"
+        element={
+          <SellerProtectedRoute>
+            <ShopCreateEventsPage />
+          </SellerProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard-events"
+        element={
+          <SellerProtectedRoute>
+            <ShopAllEventsPage />
           </SellerProtectedRoute>
         }
       />

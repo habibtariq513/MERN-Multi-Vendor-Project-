@@ -1,11 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const fs = require("fs");
-const path = require("path");
 const Product = require("../model/product");
 const Shop = require("../model/shop");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const ErrorHandler = require("../utils/ErrorHandler");
+const unlinkUploadedFiles = require("../utils/unlinkUploadedFiles");
 const { upload } = require("../multer");
 const { isSeller } = require("../middleware/auth");
 
@@ -75,26 +74,7 @@ router.delete(
       return next(new ErrorHandler("You cannot delete this product", 403));
     }
 
-    const uploadsDirectory = path.resolve(__dirname, "../uploads");
-    await Promise.all(
-      (productData.images || []).map((image) => {
-        if (typeof image !== "string" || path.basename(image) !== image) {
-          throw new ErrorHandler("Invalid product image path", 400);
-        }
-
-        const filePath = path.join(uploadsDirectory, image);
-
-        return new Promise((resolve, reject) => {
-          fs.unlink(filePath, (error) => {
-            if (error && error.code !== "ENOENT") {
-              reject(error);
-              return;
-            }
-            resolve();
-          });
-        });
-      })
-    );
+    await unlinkUploadedFiles(productData.images || []);
 
     const product = await Product.findByIdAndDelete(productId);
 
