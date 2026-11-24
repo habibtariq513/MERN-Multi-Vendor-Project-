@@ -58,6 +58,22 @@ router.get(
   })
 );
 
+router.get(
+  "/get-all-events",
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const events = await Event.find();
+
+      res.status(201).json({
+        success: true,
+        events,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  })
+);
+
 router.delete(
   "/delete-shop-event/:id",
   isSeller,

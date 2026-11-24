@@ -9,15 +9,31 @@ import {
 } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import styles from "../../../styles/styles.js";
+import { backend_url } from "../../../server.js";
 import ProductDetailsCard from "../ProductDetailsCard/ProductDetailsCard.jsx";
 
-const ProductCard = ({ data }) => {
+const ProductCard = ({ data, isShop = false, isEvent = false }) => {
   const [click, setClick] = useState(false);
   const [open, setOpen] = useState(false);
+
+  if (!data) return null;
 
   const productName = data.name.replace(/\s+/g, "-");
   const productUrl = `/product/${encodeURIComponent(productName)}`;
   const rating = Math.max(0, Math.min(5, Math.round(data.ratings || 0)));
+  const uploadedImage = data.images?.[0];
+  const imageUrl =
+    (isShop || isEvent) && uploadedImage
+      ? `${backend_url}${uploadedImage}`
+      : uploadedImage
+        ? `${backend_url}${uploadedImage}`
+        : data.image_Url?.[0]?.url || "";
+  const originalPrice = data.originalPrice ?? data.price;
+  const discountPrice =
+    data.discountPrice ?? data.discount_price ?? originalPrice;
+  const shopUrl = data.shop?._id
+    ? `/shop/preview/${data.shop._id}`
+    : "/shop";
 
   return (
     <>
@@ -28,13 +44,13 @@ const ProductCard = ({ data }) => {
           className="block"
         >
           <img
-            src={data.image_Url[0]?.url}
+            src={imageUrl}
             alt={data.name}
             className="h-[170px] w-full object-contain"
           />
         </Link>
-        <Link to="/shop" className="block">
-          <h5 className={styles.shop_name}>{data.shop.name}</h5>
+        <Link to={shopUrl} className="block">
+          <h5 className={styles.shop_name}>{data.shop?.name || "Shop"}</h5>
         </Link>
         <Link to={productUrl} className="block text-gray-900">
           <h4 className="pb-3 font-[500]">
@@ -64,14 +80,14 @@ const ProductCard = ({ data }) => {
           <div className="flex items-center justify-between py-2">
             <div className="flex">
               <h5 className={styles.productDiscountPrice}>
-                {data.price === 0 ? data.price : data.discount_price}$
+                {discountPrice}$
               </h5>
               <h4 className={styles.price}>
-                {data.price ? `${data.price} $` : null}
+                {originalPrice ? `${originalPrice} $` : null}
               </h4>
             </div>
             <span className="text-[17px] font-[400] text-[#68d284]">
-              {data.total_sell} sold
+              {data.sold_out ?? data.total_sell ?? 0} sold
             </span>
           </div>
         </Link>

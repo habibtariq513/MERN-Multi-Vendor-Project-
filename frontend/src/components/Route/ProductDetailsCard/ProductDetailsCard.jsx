@@ -7,6 +7,7 @@ import {
 } from "react-icons/ai";
 import { RxCross1 } from "react-icons/rx";
 import styles from "../../../styles/styles.js";
+import { backend_url } from "../../../server.js";
 
 const ProductDetailsCard = ({ setOpen, data }) => {
   const [count, setCount] = useState(1);
@@ -28,8 +29,15 @@ const ProductDetailsCard = ({ setOpen, data }) => {
   if (!data) return null;
 
   const shop = data.shop || {};
-  const image = data.image_Url?.[0]?.url;
-  const shopAvatar = shop.shop_avatar?.url;
+  const image = data.images?.[0]
+    ? `${backend_url}${data.images[0]}`
+    : data.image_Url?.[0]?.url;
+  const avatar = shop.avatar?.url || shop.avatar || shop.shop_avatar?.url;
+  const shopAvatar =
+    avatar && !avatar.startsWith("http") ? `${backend_url}${avatar}` : avatar;
+  const originalPrice = data.originalPrice ?? data.price;
+  const discountPrice =
+    data.discountPrice ?? data.discount_price ?? originalPrice;
 
   return (
     <div className="bg-[#fff]">
@@ -88,7 +96,7 @@ const ProductDetailsCard = ({ setOpen, data }) => {
                 </span>
               </button>
               <h5 className="mt-5 text-[16px] text-[red]">
-                ({data.total_sell ?? 0}) Sold out
+                ({data.sold_out ?? data.total_sell ?? 0}) Sold out
               </h5>
             </div>
 
@@ -100,10 +108,10 @@ const ProductDetailsCard = ({ setOpen, data }) => {
 
               <div className="flex pt-3">
                 <h4 className={styles.productDiscountPrice}>
-                  {data.discount_price ?? data.price}$
+                  {discountPrice}$
                 </h4>
                 <h3 className={styles.price}>
-                  {data.price ? `${data.price}$` : null}
+                  {originalPrice ? `${originalPrice}$` : null}
                 </h3>
               </div>
               <div className="mt-12 flex items-center justify-between pr-3">

@@ -1,8 +1,11 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import styles from "../../styles/styles.js";
 import EventCard from "./EventCard.jsx";
 
 const Events = () => {
+  const { allEvents, isLoading } = useSelector((state) => state.events);
+
   return (
     <div>
       <div className={styles.section}>
@@ -11,7 +14,13 @@ const Events = () => {
         </div>
 
         <div className="grid w-full">
-          <EventCard />
+          {allEvents?.length > 0 ? (
+            <EventCard data={allEvents[0]} />
+          ) : isLoading ? (
+            <p>Loading events...</p>
+          ) : (
+            <p>No events available.</p>
+          )}
         </div>
       </div>
     </div>

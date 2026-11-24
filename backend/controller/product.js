@@ -9,6 +9,22 @@ const { upload } = require("../multer");
 const { isSeller } = require("../middleware/auth");
 
 router.get(
+  "/get-all-products",
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const products = await Product.find().sort({ createdAt: -1 });
+
+      res.status(201).json({
+        success: true,
+        products,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  })
+);
+
+router.get(
   "/get-all-products-shop/:id",
   catchAsyncErrors(async (req, res) => {
     const products = await Product.find({ shopId: req.params.id });

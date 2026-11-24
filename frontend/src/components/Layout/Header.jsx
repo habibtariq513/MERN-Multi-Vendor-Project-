@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "../../styles/styles.js";
-import { categoriesData, productData } from "../../static/data.js";
+import { categoriesData } from "../../static/data.js";
+import { backend_url } from "../../server.js";
 import {
   AiOutlineHeart,
   AiOutlineSearch,
@@ -27,6 +28,7 @@ const Header = ({ activeHeading }) => {
   const [openWishlist, setOpenWishlist] = useState(false);
   const [open, setOpen] = useState(false);
   const { isAuthenticated, user } = useSelector((state) => state.user);
+  const { allProducts } = useSelector((state) => state.products);
 
   useEffect(() => {
     const handleScroll = () => setActive(window.scrollY > 70);
@@ -35,20 +37,26 @@ const Header = ({ activeHeading }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleSearchChange = (event) => {
-    const term = event.target.value;
-    setSearchTerm(term);
+  useEffect(() => {
+    const term = searchTerm.trim().toLowerCase();
     setSearchData(
-      term.trim()
-        ? productData.filter((product) =>
-            product.name.toLowerCase().includes(term.trim().toLowerCase())
+      term
+        ? (allProducts || []).filter((product) =>
+            product.name.toLowerCase().includes(term)
           )
         : []
     );
+  }, [allProducts, searchTerm]);
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
   };
 
   const searchResults = searchData.map((product) => {
     const productName = product.name.replace(/\s+/g, "-");
+    const imageUrl = product.images?.[0]
+      ? `${backend_url}${product.images[0]}`
+      : product.image_Url?.[0]?.url || "";
     return (
       <Link
         key={product.name}
@@ -60,7 +68,7 @@ const Header = ({ activeHeading }) => {
         className="flex items-center gap-3 px-3 py-2 hover:bg-slate-100"
       >
         <img
-          src={product.image_Url[0]?.url}
+          src={imageUrl}
           alt=""
           className="h-10 w-10 rounded object-cover"
         />
@@ -225,6 +233,9 @@ const Header = ({ activeHeading }) => {
                   <div className="absolute bg-[#fff] z-10 shadow w-full left-0 p-3">
                     {searchData.map((item) => {
                       const productName = item.name.replace(/\s+/g, "-");
+                      const imageUrl = item.images?.[0]
+                        ? `${backend_url}${item.images[0]}`
+                        : item.image_Url?.[0]?.url || "";
                       return (
                         <Link
                           key={item.name}
@@ -233,7 +244,7 @@ const Header = ({ activeHeading }) => {
                         >
                           <div className="flex items-center">
                             <img
-                              src={item.image_Url[0].url}
+                              src={imageUrl}
                               alt=""
                               className="w-[50px] mr-2"
                             />

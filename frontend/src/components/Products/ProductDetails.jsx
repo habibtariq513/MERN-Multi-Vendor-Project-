@@ -5,8 +5,10 @@ import {
   AiOutlineMessage,
   AiOutlineShoppingCart,
 } from "react-icons/ai";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import styles from "../../styles/styles.js";
+import { backend_url } from "../../server.js";
 import ProductDetailsInfo from "./ProductDetailsInfo.jsx";
 
 const ProductDetails = ({ data }) => {
@@ -14,6 +16,7 @@ const ProductDetails = ({ data }) => {
   const [click, setClick] = useState(false);
   const [select, setSelect] = useState(0);
   const navigate = useNavigate();
+  const { products, allProducts } = useSelector((state) => state.products);
 
   const incrementCount = () => {
     setCount(count + 1);
@@ -31,9 +34,50 @@ const ProductDetails = ({ data }) => {
 
   if (!data) return null;
 
-  const firstImage = data.image_Url?.[0]?.url || "";
-  const secondImage = data.image_Url?.[1]?.url || firstImage;
-  const shopAvatar = data.shop?.shop_avatar?.url || firstImage;
+  const images =
+    data.images?.length > 0
+      ? data.images.map((image) => `${backend_url}${image}`)
+      : data.image_Url?.map((image) => image.url) || [];
+  const selectedImage = images[select] || images[0] || "";
+  const firstImage = images[0] || "";
+  const shop = data.shop || {};
+  const avatar =
+    shop.avatar?.url || shop.avatar || shop.shop_avatar?.url || firstImage;
+  const shopAvatar =
+    avatar && !avatar.startsWith("http") ? `${backend_url}${avatar}` : avatar;
+  const originalPrice = data.originalPrice ?? data.price;
+  const discountPrice =
+    data.discountPrice ?? data.discount_price ?? originalPrice;
+  const matchingShopProducts =
+    products?.filter(
+      (product) => String(product.shopId) === String(shop._id)
+    ) || [];
+  const totalShopProducts =
+    matchingShopProducts.length ||
+    allProducts?.filter(
+      (product) => String(product.shopId) === String(shop._id)
+    ).length ||
+    0;
+  const shopSummary = (
+    <>
+      <img
+        src={shopAvatar}
+        alt={`${shop.name || "Shop"} avatar`}
+        className="w-[50px] h-[50px] rounded-full mr-2"
+      />
+      <div className="pr-8">
+        <h3 className={`${styles.shop_name} pb-1 pt-1`}>
+          {shop.name || "Shop"}
+        </h3>
+        <h5 className="pb-3 text-[15px]">
+          ({shop.ratings || data.ratings || 0}) Ratings
+        </h5>
+        <span className="text-sm text-gray-600">
+          {totalShopProducts} Products
+        </span>
+      </div>
+    </>
+  );
 
   return (
     <div className="bg-white">
@@ -42,35 +86,26 @@ const ProductDetails = ({ data }) => {
           <div className="block w-full 800px:flex">
             <div className="w-full 800px:w-[50%]">
               <img
-                src={select === 0 ? firstImage : secondImage}
+                src={selectedImage}
                 alt=""
                 className="w-[80%]"
               />
               <div className="w-full flex">
-                <div
-                  className={`${
-                    select === 0 ? "border" : "null"
-                  } cursor-pointer`}
-                >
-                  <img
-                    src={firstImage}
-                    alt=""
-                    className="h-[200px]"
-                    onClick={() => setSelect(0)}
-                  />
-                </div>
-                <div
-                  className={`${
-                    select === 1 ? "border" : "null"
-                  } cursor-pointer`}
-                >
-                  <img
-                    src={secondImage}
-                    alt=""
-                    className="h-[200px]"
-                    onClick={() => setSelect(1)}
-                  />
-                </div>
+                {images.map((image, index) => (
+                  <div
+                    className={`${
+                      select === index ? "border" : "null"
+                    } cursor-pointer`}
+                    key={image}
+                  >
+                    <img
+                      src={image}
+                      alt={`${data.name} ${index + 1}`}
+                      className="h-[200px]"
+                      onClick={() => setSelect(index)}
+                    />
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -80,10 +115,10 @@ const ProductDetails = ({ data }) => {
 
               <div className="flex pt-3">
                 <h4 className={`${styles.productDiscountPrice}`}>
-                  {data.discount_price}$
+                  {discountPrice}$
                 </h4>
                 <h3 className={`${styles.price}`}>
-                  {data.price ? data.price + "$" : null}
+                  {originalPrice ? `${originalPrice}$` : null}
                 </h3>
               </div>
 
@@ -135,19 +170,16 @@ const ProductDetails = ({ data }) => {
               </div>
 
               <div className="flex items-center pt-8">
-                <img
-                  src={shopAvatar}
-                  alt=""
-                  className="w-[50px] h-[50px] rounded-full mr-2"
-                />
-                <div className="pr-8">
-                  <h3 className={`${styles.shop_name} pb-1 pt-1`}>
-                    {data.shop.name}
-                  </h3>
-                  <h5 className="pb-3 text-[15px]">
-                    ({data.shop.ratings || data.ratings}) Ratings
-                  </h5>
-                </div>
+                {shop._id ? (
+                  <Link
+                    to={`/shop/preview/${shop._id}`}
+                    className="flex items-center"
+                  >
+                    {shopSummary}
+                  </Link>
+                ) : (
+                  <div className="flex items-center">{shopSummary}</div>
+                )}
                 <div
                   className={`${styles.button} bg-[#6443d1] mt-4 !rounded !h-11`}
                   onClick={handleMessageSubmit}

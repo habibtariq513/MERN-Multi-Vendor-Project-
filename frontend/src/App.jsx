@@ -4,6 +4,8 @@ import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import SellerProtectedRoute from "./routes/SellerProtectedRoute.jsx";
 import store from "./redux/store.js";
 import { loadSeller } from "./redux/actions/seller.js";
+import { getAllProducts } from "./redux/actions/product.js";
+import { getAllEvents } from "./redux/actions/event.js";
 import {
   ActivationPage,
   BestSellingPage,
@@ -33,6 +35,8 @@ import {
 function App() {
   useEffect(() => {
     store.dispatch(loadSeller());
+    store.dispatch(getAllProducts());
+    store.dispatch(getAllEvents());
   }, []);
 
   return (
@@ -74,6 +78,10 @@ function App() {
         element={<SellerActivationPage />}
       />
       <Route path="/shop-login" element={<ShopLoginPage />} />
+      <Route
+        path="/shop/preview/:id"
+        element={<ShopHomePage isOwner={false} />}
+      />
       <Route
         path="/shop/:id"
         element={

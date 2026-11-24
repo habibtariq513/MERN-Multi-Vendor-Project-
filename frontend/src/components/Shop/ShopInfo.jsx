@@ -1,15 +1,28 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import styles from "../../styles/styles.js";
 import { backend_url, server } from "../../server.js";
 import { toast } from "react-toastify";
 
 const ShopInfo = ({ isOwner }) => {
-  const { seller } = useSelector((state) => state.seller);
-  const avatar = seller?.avatar?.url || seller?.avatar;
+  const { products, allProducts } = useSelector((state) => state.products);
+  const [data, setData] = useState(null);
+  const { id } = useParams();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!id) return;
+
+    setData(null);
+    axios
+      .get(`${server}/shop/get-shop-info/${id}`)
+      .then(({ data: response }) => setData(response.shop))
+      .catch((error) => {
+        toast.error(error.response?.data?.message || "Unable to load shop");
+      });
+  }, [id]);
 
   const logoutHandler = async () => {
     try {
@@ -24,32 +37,46 @@ const ShopInfo = ({ isOwner }) => {
     }
   };
 
+  const avatar = data?.avatar?.url || data?.avatar;
+  const avatarUrl = avatar
+    ? avatar.startsWith("http")
+      ? avatar
+      : `${backend_url}${avatar}`
+    : "";
+  const shopProducts =
+    products?.filter((product) => String(product.shopId) === String(id)) || [];
+  const allShopProducts =
+    allProducts?.filter((product) => String(product.shopId) === String(id)) ||
+    [];
+
   return (
     <>
       <div className="w-full py-5">
         <div className="w-full flex item-center justify-center">
           <img
-            src={avatar ? `${backend_url}${avatar}` : ""}
-            alt=""
+            src={avatarUrl}
+            alt={data?.name ? `${data.name} avatar` : "Shop avatar"}
             className="w-[150px] h-[150px] object-cover rounded-full"
           />
         </div>
-        <h3 className="text-center py-2 text-[20px]">{seller?.name}</h3>
+        <h3 className="text-center py-2 text-[20px]">{data?.name}</h3>
         <p className="text-[16px] text-[#000000a6] p-[10px] flex items-center">
-          {seller?.description}
+          {data?.description}
         </p>
       </div>
       <div className="p-3">
         <h5 className="font-[600]">Address</h5>
-        <h4 className="text-[#000000a6]">{seller?.address}</h4>
+        <h4 className="text-[#000000a6]">{data?.address}</h4>
       </div>
       <div className="p-3">
         <h5 className="font-[600]">Phone Number</h5>
-        <h4 className="text-[#000000a6]">{seller?.phoneNumber}</h4>
+        <h4 className="text-[#000000a6]">{data?.phoneNumber}</h4>
       </div>
       <div className="p-3">
         <h5 className="font-[600]">Total Products</h5>
-        <h4 className="text-[#000000a6]">10</h4>
+        <h4 className="text-[#000000a6]">
+          {shopProducts.length || allShopProducts.length}
+        </h4>
       </div>
       <div className="p-3">
         <h5 className="font-[600]">Shop Ratings</h5>
@@ -58,7 +85,7 @@ const ShopInfo = ({ isOwner }) => {
       <div className="p-3">
         <h5 className="font-[600]">Joined on</h5>
         <h4 className="text-[#000000b0]">
-          {seller?.createdAt?.slice(0, 10)}
+          {data?.createdAt?.slice(0, 10)}
         </h4>
       </div>
       {isOwner && (

@@ -1,6 +1,28 @@
 import axios from "axios";
 import { server } from "../../server.js";
 
+export const getAllEvents = () => async (dispatch) => {
+  try {
+    dispatch({
+      type: "getAllEventsRequest",
+    });
+
+    const { data } = await axios.get(`${server}/event/get-all-events`);
+    dispatch({
+      type: "getAllEventsSuccess",
+      payload: data.events,
+    });
+  } catch (error) {
+    dispatch({
+      type: "getAllEventsFailed",
+      payload:
+        error.response?.data?.message ||
+        error.message ||
+        "Unable to load events",
+    });
+  }
+};
+
 export const createevent = (newForm) => async (dispatch) => {
   try {
     dispatch({

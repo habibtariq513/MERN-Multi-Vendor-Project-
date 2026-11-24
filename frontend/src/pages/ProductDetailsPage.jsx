@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 import Footer from "../components/Layout/Footer.jsx";
 import Header from "../components/Layout/Header.jsx";
 import ProductDetails from "../components/Products/ProductDetails.jsx";
@@ -8,13 +9,15 @@ import { productData } from "../static/data.js";
 
 const ProductDetailsPage = () => {
   const { name } = useParams();
-  const [data, setData] = useState(null);
-  const productName = name.replace(/-/g, " ");
-
-  useEffect(() => {
-    const product = productData.find((item) => item.name === productName);
-    setData(product);
-  }, [productName]);
+  const { allProducts } = useSelector((state) => state.products);
+  const productName = name?.replace(/-/g, " ");
+  const data =
+    allProducts?.find(
+      (product) =>
+        product.name === productName ||
+        product.name.replace(/\s+/g, "-") === name
+    ) ||
+    productData.find((product) => product.name === productName);
 
   return (
     <div>

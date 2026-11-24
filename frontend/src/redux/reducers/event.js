@@ -2,10 +2,24 @@ import { createReducer } from "@reduxjs/toolkit";
 
 const initialState = {
   isLoading: true,
+  allEvents: [],
 };
 
 export const eventReducer = createReducer(initialState, (builder) => {
   builder
+    .addCase("getAllEventsRequest", (state) => {
+      state.isLoading = true;
+      state.error = null;
+    })
+    .addCase("getAllEventsSuccess", (state, action) => {
+      state.isLoading = false;
+      state.allEvents = action.payload;
+      state.error = null;
+    })
+    .addCase("getAllEventsFailed", (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
+    })
     .addCase("eventCreateRequest", (state) => {
       state.isLoading = true;
       state.success = false;

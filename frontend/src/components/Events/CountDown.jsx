@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 
-const targetDate = new Date("2026-12-31T23:59:59");
+const calculateTimeLeft = (finishDate) => {
+  const targetDate = finishDate ? new Date(finishDate) : null;
+  const difference = targetDate ? targetDate.getTime() - Date.now() : 0;
 
-const calculateTimeLeft = () => {
-  const difference = targetDate.getTime() - Date.now();
-
-  if (difference <= 0) {
+  if (!targetDate || Number.isNaN(targetDate.getTime()) || difference <= 0) {
     return { days: 0, hours: 0, minutes: 0, seconds: 0 };
   }
 
@@ -17,16 +16,20 @@ const calculateTimeLeft = () => {
   };
 };
 
-const CountDown = () => {
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft);
+const CountDown = ({ data }) => {
+  const finishDate = data?.Finish_Date;
+  const [timeLeft, setTimeLeft] = useState(() =>
+    calculateTimeLeft(finishDate)
+  );
 
   useEffect(() => {
+    setTimeLeft(calculateTimeLeft(finishDate));
     const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
+      setTimeLeft(calculateTimeLeft(finishDate));
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [finishDate]);
 
   const timerComponents = Object.entries(timeLeft).map(([interval, value]) => (
     <span

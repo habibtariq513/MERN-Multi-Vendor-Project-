@@ -183,4 +183,30 @@ router.get(
   })
 );
 
+router.get(
+  "/get-shop-info/:id",
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const shop = await Shop.findById(req.params.id);
+
+      if (!shop) {
+        return next(new ErrorHandler("Shop not found", 404));
+      }
+
+      const shopData =
+        typeof shop.toObject === "function" ? shop.toObject() : { ...shop };
+      delete shopData.password;
+      delete shopData.resetPasswordToken;
+      delete shopData.resetPasswordTime;
+
+      res.status(201).json({
+        success: true,
+        shop: shopData,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+
 module.exports = router;

@@ -1,11 +1,32 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import styles from "../../styles/styles.js";
+import { backend_url } from "../../server.js";
 
 const ProductDetailsInfo = ({ data }) => {
   const [active, setActive] = useState(1);
+  const { products, allProducts } = useSelector((state) => state.products);
+  const shop = data.shop || {};
+  const avatar =
+    shop.avatar?.url ||
+    shop.avatar ||
+    shop.shop_avatar?.url ||
+    data.images?.[0] ||
+    data.image_Url?.[0]?.url ||
+    "";
   const shopAvatar =
-    data.shop?.shop_avatar?.url || data.image_Url?.[0]?.url || "";
+    avatar && !avatar.startsWith("http") ? `${backend_url}${avatar}` : avatar;
+  const shopProducts =
+    products?.filter(
+      (product) => String(product.shopId) === String(shop._id)
+    ) || [];
+  const totalProducts =
+    shopProducts.length ||
+    allProducts?.filter(
+      (product) => String(product.shopId) === String(shop._id)
+    ).length ||
+    0;
 
   return (
     <div className="bg-[#f5f6fb] px-3 800px:px-10 py-2 rounded">
@@ -69,31 +90,34 @@ const ProductDetailsInfo = ({ data }) => {
                 className="w-[50px] h-[50px] rounded-full"
               />
               <div className="pl-3">
-                <h3 className={`${styles.shop_name}`}>{data.shop.name}</h3>
+                <h3 className={`${styles.shop_name}`}>{shop.name}</h3>
                 <h5 className="pb-2 text-[15px]">
-                  ({data.shop.ratings || data.ratings}) Ratings
+                  ({shop.ratings || data.ratings || 0}) Ratings
                 </h5>
               </div>
             </div>
-            <p className="pt-2">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem
-              eligendi eum laudantium, libero voluptatum atque! Dolorum
-              voluptatibus nihil dicta suscipit, quam, temporibus magni,
-              temporibus magni dolorum ipsa.
-            </p>
+            <p className="pt-2">{shop.description}</p>
           </div>
           <div className="w-full 800px:w-[50%] mt-5 800px:mt-0 800px:flex flex-col items-end">
             <div className="text-left">
               <h5 className="font-[600]">
-                Joined on <span className="font-[500]">14 March, 2023</span>
+                Joined on{" "}
+                <span className="font-[500]">
+                  {shop.createdAt?.slice(0, 10)}
+                </span>
               </h5>
               <h5 className="font-[600] pt-3">
-                Total Products <span className="font-[500]">1,223</span>
+                Total Products{" "}
+                <span className="font-[500]">{totalProducts}</span>
               </h5>
               <h5 className="font-[600] pt-3">
                 Total Reviews <span className="font-[500]">324</span>
               </h5>
-              <Link to="/">
+              <Link
+                to={
+                  shop._id ? `/shop/preview/${shop._id}` : "/shop"
+                }
+              >
                 <div
                   className={`${styles.button} !rounded-[4px] !h-[39.5px] mt-3`}
                 >

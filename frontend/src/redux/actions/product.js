@@ -1,6 +1,28 @@
 import axios from "axios";
 import { server } from "../../server.js";
 
+export const getAllProducts = () => async (dispatch) => {
+  try {
+    dispatch({
+      type: "getAllProductsRequest",
+    });
+
+    const { data } = await axios.get(`${server}/product/get-all-products`);
+    dispatch({
+      type: "getAllProductsSuccess",
+      payload: data.products,
+    });
+  } catch (error) {
+    dispatch({
+      type: "getAllProductsFailed",
+      payload:
+        error.response?.data?.message ||
+        error.message ||
+        "Unable to load products",
+    });
+  }
+};
+
 export const createProduct = (newForm) => async (dispatch) => {
   try {
     dispatch({
