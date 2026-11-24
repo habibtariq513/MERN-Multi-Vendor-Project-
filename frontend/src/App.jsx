@@ -1,6 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import SellerProtectedRoute from "./routes/SellerProtectedRoute.jsx";
 import store from "./redux/store.js";
@@ -22,10 +21,9 @@ import {
   ShopHomePage,
   SignupPage,
 } from "./Routes.js";
+import { ShopDashboardPage } from "./ShopRoutes.js";
 
 function App() {
-  const { isAuthenticated } = useSelector((state) => state.user);
-
   useEffect(() => {
     store.dispatch(loadSeller());
   }, []);
@@ -50,7 +48,7 @@ function App() {
       <Route
         path="/profile"
         element={
-          <ProtectedRoute isAuthenticated={isAuthenticated}>
+          <ProtectedRoute>
             <ProfilePage />
           </ProtectedRoute>
         }
@@ -58,7 +56,7 @@ function App() {
       <Route
         path="/checkout"
         element={
-          <ProtectedRoute isAuthenticated={isAuthenticated}>
+          <ProtectedRoute>
             <CheckoutPage />
           </ProtectedRoute>
         }
@@ -74,6 +72,14 @@ function App() {
         element={
           <SellerProtectedRoute>
             <ShopHomePage />
+          </SellerProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <SellerProtectedRoute>
+            <ShopDashboardPage />
           </SellerProtectedRoute>
         }
       />

@@ -1,9 +1,24 @@
 import React from "react";
+import LottieModule from "react-lottie";
+import animationData from "../../Assests/animations/2451-ecommerce-loader.json";
 
-const Loader = () => (
-  <div className="flex min-h-screen items-center justify-center">
-    <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-[#3321c8]" />
-  </div>
-);
+const Lottie = LottieModule.default;
+
+const Loader = () => {
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+
+  return (
+    <div className="w-full h-screen flex items-center justify-center">
+      <Lottie height={300} options={defaultOptions} width={300} />
+    </div>
+  );
+};
 
 export default Loader;
