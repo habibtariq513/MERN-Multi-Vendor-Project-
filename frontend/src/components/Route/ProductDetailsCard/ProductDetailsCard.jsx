@@ -8,10 +8,15 @@ import {
 import { RxCross1 } from "react-icons/rx";
 import styles from "../../../styles/styles.js";
 import { backend_url } from "../../../server.js";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { addToCart } from "../../../redux/actions/cart.js";
+import { addToWishlist, removeFromWishlist } from "../../../redux/actions/wishlist.js";
 
 const ProductDetailsCard = ({ setOpen, data }) => {
   const [count, setCount] = useState(1);
-  const [click, setClick] = useState(false);
+  const dispatch = useDispatch();
+  const { wishlist } = useSelector((state) => state.wishlist);
   //   const [select, setSelect] = useState(false);
 
   const handleMessageSubmit = () => {};
@@ -23,6 +28,10 @@ const ProductDetailsCard = ({ setOpen, data }) => {
   };
 
   const incrementCount = () => {
+    if (typeof data.stock === "number" && count >= data.stock) {
+      toast.error("Product stock limited!");
+      return;
+    }
     setCount(count + 1);
   };
 
@@ -38,6 +47,27 @@ const ProductDetailsCard = ({ setOpen, data }) => {
   const originalPrice = data.originalPrice ?? data.price;
   const discountPrice =
     data.discountPrice ?? data.discount_price ?? originalPrice;
+  const itemId = data._id || data.id || data.name;
+  const click = (wishlist || []).some(
+    (item) => (item._id || item.id || item.name) === itemId
+  );
+
+  const toggleWishlist = () => {
+    const item = { ...data, _id: itemId };
+    if (click) {
+      dispatch(removeFromWishlist(item));
+    } else {
+      dispatch(addToWishlist(item));
+    }
+  };
+
+  const addItemToCart = () => {
+    if (typeof data.stock === "number" && data.stock < count) {
+      toast.error("Product stock limited!");
+      return;
+    }
+    dispatch(addToCart({ ...data, _id: itemId, qty: count }));
+  };
 
   return (
     <div className="bg-[#fff]">
@@ -139,7 +169,7 @@ const ProductDetailsCard = ({ setOpen, data }) => {
                 <button
                   type="button"
                   className="cursor-pointer"
-                  onClick={() => setClick((isSelected) => !isSelected)}
+                  onClick={toggleWishlist}
                   aria-label={
                     click ? "Remove from wishlist" : "Add to wishlist"
                   }
@@ -155,7 +185,7 @@ const ProductDetailsCard = ({ setOpen, data }) => {
               <button
                 type="button"
                 className={`${styles.button} mt-6 flex h-11 items-center rounded-[4px]`}
-                onClick={handleMessageSubmit}
+                onClick={addItemToCart}
               >
                 <span className="flex items-center text-[#fff]">
                   Add to cart <AiOutlineShoppingCart className="ml-1" />

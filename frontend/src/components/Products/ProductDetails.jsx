@@ -6,19 +6,27 @@ import {
   AiOutlineShoppingCart,
 } from "react-icons/ai";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import styles from "../../styles/styles.js";
 import { backend_url } from "../../server.js";
+import { toast } from "react-toastify";
+import { addToCart } from "../../redux/actions/cart.js";
+import { addToWishlist, removeFromWishlist } from "../../redux/actions/wishlist.js";
 import ProductDetailsInfo from "./ProductDetailsInfo.jsx";
 
 const ProductDetails = ({ data }) => {
   const [count, setCount] = useState(1);
-  const [click, setClick] = useState(false);
   const [select, setSelect] = useState(0);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { products, allProducts } = useSelector((state) => state.products);
+  const { wishlist } = useSelector((state) => state.wishlist);
 
   const incrementCount = () => {
+    if (typeof data?.stock === "number" && count >= data.stock) {
+      toast.error("Product stock limited!");
+      return;
+    }
     setCount(count + 1);
   };
 
@@ -48,6 +56,25 @@ const ProductDetails = ({ data }) => {
   const originalPrice = data.originalPrice ?? data.price;
   const discountPrice =
     data.discountPrice ?? data.discount_price ?? originalPrice;
+  const itemId = data._id || data.id || data.name;
+  const click = (wishlist || []).some(
+    (item) => (item._id || item.id || item.name) === itemId
+  );
+  const toggleWishlist = () => {
+    const item = { ...data, _id: itemId };
+    if (click) {
+      dispatch(removeFromWishlist(item));
+    } else {
+      dispatch(addToWishlist(item));
+    }
+  };
+  const addItemToCart = () => {
+    if (typeof data.stock === "number" && data.stock < count) {
+      toast.error("Product stock limited!");
+      return;
+    }
+    dispatch(addToCart({ ...data, _id: itemId, qty: count }));
+  };
   const matchingShopProducts =
     products?.filter(
       (product) => String(product.shopId) === String(shop._id)
@@ -144,7 +171,7 @@ const ProductDetails = ({ data }) => {
                   {click ? (
                     <AiFillHeart
                       className="cursor-pointer"
-                      onClick={() => setClick(!click)}
+                      onClick={toggleWishlist}
                       size={30}
                       color="red"
                       title="Remove from wishlist"
@@ -152,7 +179,7 @@ const ProductDetails = ({ data }) => {
                   ) : (
                     <AiOutlineHeart
                       className="cursor-pointer"
-                      onClick={() => setClick(!click)}
+                      onClick={toggleWishlist}
                       size={30}
                       color="#333"
                       title="Add to wishlist"
@@ -163,6 +190,7 @@ const ProductDetails = ({ data }) => {
 
               <div
                 className={`${styles.button} !mt-6 !rounded !h-11 flex items-center`}
+                onClick={addItemToCart}
               >
                 <span className="text-white flex items-center">
                   Add to cart <AiOutlineShoppingCart className="ml-1" />

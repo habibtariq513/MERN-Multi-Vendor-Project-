@@ -8,16 +8,15 @@ import SuggestedProduct from "../components/Products/SuggestedProduct.jsx";
 import { productData } from "../static/data.js";
 
 const ProductDetailsPage = () => {
-  const { name } = useParams();
+  const { id } = useParams();
   const { allProducts } = useSelector((state) => state.products);
-  const productName = name?.replace(/-/g, " ");
   const data =
     allProducts?.find(
-      (product) =>
-        product.name === productName ||
-        product.name.replace(/\s+/g, "-") === name
+      (product) => String(product._id) === String(id)
     ) ||
-    productData.find((product) => product.name === productName);
+    productData.find(
+      (product) => String(product._id || product.id || product.name) === String(id)
+    );
 
   return (
     <div>

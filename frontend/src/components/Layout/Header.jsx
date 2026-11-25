@@ -29,6 +29,8 @@ const Header = ({ activeHeading }) => {
   const [open, setOpen] = useState(false);
   const { isAuthenticated, user } = useSelector((state) => state.user);
   const { allProducts } = useSelector((state) => state.products);
+  const { cart } = useSelector((state) => state.cart);
+  const { wishlist } = useSelector((state) => state.wishlist);
 
   useEffect(() => {
     const handleScroll = () => setActive(window.scrollY > 70);
@@ -53,14 +55,14 @@ const Header = ({ activeHeading }) => {
   };
 
   const searchResults = searchData.map((product) => {
-    const productName = product.name.replace(/\s+/g, "-");
+    const productId = product._id || product.id || product.name;
     const imageUrl = product.images?.[0]
       ? `${backend_url}${product.images[0]}`
       : product.image_Url?.[0]?.url || "";
     return (
       <Link
         key={product.name}
-        to={`/product/${encodeURIComponent(productName)}`}
+        to={`/product/${encodeURIComponent(productId)}`}
         onClick={() => {
           setSearchTerm("");
           setSearchData([]);
@@ -133,7 +135,7 @@ const Header = ({ activeHeading }) => {
       >
         <AiOutlineHeart size={30} color="rgb(255 255 255 / 83%)" />
         <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#3bc177] font-mono text-[12px] leading-tight text-white">
-          0
+          {wishlist?.length || 0}
         </span>
       </button>
       <button
@@ -144,7 +146,7 @@ const Header = ({ activeHeading }) => {
       >
         <AiOutlineShoppingCart size={30} color="rgb(255 255 255 / 83%)" />
         <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#3bc177] font-mono text-[12px] leading-tight text-white">
-          0
+          {cart?.length || 0}
         </span>
       </button>
       <Link to="/login" aria-label="Sign in">
@@ -192,7 +194,7 @@ const Header = ({ activeHeading }) => {
             >
               <AiOutlineShoppingCart size={30} />
               <span className="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
-                1
+                {cart?.length || 0}
               </span>
             </div>
           </div>
@@ -210,7 +212,7 @@ const Header = ({ activeHeading }) => {
                   >
                     <AiOutlineHeart className="mt-5 ml-3" size={30} />
                     <span className="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
-                      0
+                      {wishlist?.length || 0}
                     </span>
                   </div>
                 </div>
@@ -232,14 +234,14 @@ const Header = ({ activeHeading }) => {
                 {searchData && searchData.length !== 0 && (
                   <div className="absolute bg-[#fff] z-10 shadow w-full left-0 p-3">
                     {searchData.map((item) => {
-                      const productName = item.name.replace(/\s+/g, "-");
+                      const productId = item._id || item.id || item.name;
                       const imageUrl = item.images?.[0]
                         ? `${backend_url}${item.images[0]}`
                         : item.image_Url?.[0]?.url || "";
                       return (
                         <Link
                           key={item.name}
-                          to={`/product/${encodeURIComponent(productName)}`}
+                          to={`/product/${encodeURIComponent(productId)}`}
                           onClick={() => setOpen(false)}
                         >
                           <div className="flex items-center">

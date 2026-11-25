@@ -72,9 +72,8 @@ const AllProducts = () => {
       headerName: "",
       sortable: false,
       renderCell: (params) => {
-        const productName = params.row.name.replace(/\s+/g, "-");
         return (
-          <Link to={`/product/${encodeURIComponent(productName)}`}>
+          <Link to={`/product/${encodeURIComponent(params.row.id)}`}>
             <Button aria-label={`Preview ${params.row.name}`}>
               <AiOutlineEye size={20} />
             </Button>

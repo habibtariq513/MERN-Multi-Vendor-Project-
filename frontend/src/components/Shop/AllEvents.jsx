@@ -67,9 +67,8 @@ const AllEvents = () => {
       headerName: "",
       sortable: false,
       renderCell: (params) => {
-        const eventName = params.row.name.replace(/\s+/g, "-");
         return (
-          <Link to={`/product/${encodeURIComponent(eventName)}`}>
+          <Link to={`/product/${encodeURIComponent(params.row.id)}`}>
             <Button aria-label={`Preview ${params.row.name}`}>
               <AiOutlineEye size={20} />
             </Button>
