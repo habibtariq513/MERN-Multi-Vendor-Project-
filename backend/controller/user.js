@@ -12,6 +12,17 @@ const sendMail = require("../utils/sendMail");
 const sendToken = require("../utils/jwtToken");
 const { isAuthenticated } = require("../middleware/auth");
 
+router.get(
+  "/get-user",
+  isAuthenticated,
+  catchAsyncErrors(async (req, res) => {
+    res.status(200).json({
+      success: true,
+      user: req.user,
+    });
+  })
+);
+
 router.post(
   "/login-user",
   catchAsyncErrors(async (req, res, next) => {
@@ -144,6 +155,166 @@ router.post(
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
     }
+  })
+);
+
+router.put(
+  "/update-user-info",
+  isAuthenticated,
+  catchAsyncErrors(async (req, res, next) => {
+    const { email, password, phoneNumber, name } = req.body;
+    const user = await User.findById(req.user.id).select("+password");
+
+    if (!user) {
+      return next(new ErrorHandler("User not found", 400));
+    }
+
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
+      return next(new ErrorHandler("Please provide the correct information", 400));
+    }
+
+    user.name = name;
+    user.email = email;
+    user.phoneNumber = phoneNumber;
+    await user.save();
+
+    res.status(201).json({
+      success: true,
+      user,
+    });
+  })
+);
+
+router.put(
+  "/update-avatar",
+  isAuthenticated,
+  upload.single("file"),
+  catchAsyncErrors(async (req, res, next) => {
+    if (!req.file) {
+      return next(new ErrorHandler("Please upload a profile image", 400));
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return next(new ErrorHandler("User not found", 400));
+    }
+
+    if (user.avatar?.url) {
+      const oldFilename = path.basename(user.avatar.url);
+      const oldFilePath = path.join(__dirname, "../uploads", oldFilename);
+      if (fs.existsSync(oldFilePath)) {
+        fs.unlinkSync(oldFilePath);
+      }
+    }
+
+    const filename = path.basename(req.file.filename);
+    user.avatar = {
+      public_id: filename,
+      url: filename,
+    };
+    await user.save();
+
+    res.status(201).json({
+      success: true,
+      user,
+    });
+  })
+);
+
+router.put(
+  "/update-user-addresses",
+  isAuthenticated,
+  catchAsyncErrors(async (req, res, next) => {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return next(new ErrorHandler("User not found", 400));
+    }
+
+    const sameTypeAddress = user.addresses.find(
+      (address) => address.addressType === req.body.addressType
+    );
+    if (sameTypeAddress) {
+      return next(
+        new ErrorHandler(`${req.body.addressType} address already exists`, 400)
+      );
+    }
+
+    const existsAddress = user.addresses.find(
+      (address) =>
+        address.country === req.body.country &&
+        address.city === req.body.city &&
+        address.address1 === req.body.address1 &&
+        address.address2 === req.body.address2 &&
+        address.zipCode === Number(req.body.zipCode)
+    );
+    if (existsAddress) {
+      return next(new ErrorHandler("Address already exists", 400));
+    }
+
+    user.addresses.push({
+      ...req.body,
+      zipCode: Number(req.body.zipCode),
+    });
+    await user.save();
+
+    res.status(201).json({
+      success: true,
+      user,
+    });
+  })
+);
+
+router.delete(
+  "/delete-user-address/:id",
+  isAuthenticated,
+  catchAsyncErrors(async (req, res, next) => {
+    const userId = req.user.id;
+    await User.updateOne(
+      { _id: userId },
+      { $pull: { addresses: { _id: req.params.id } } }
+    );
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return next(new ErrorHandler("User not found", 400));
+    }
+
+    res.status(201).json({
+      success: true,
+      user,
+    });
+  })
+);
+
+router.put(
+  "/update-user-password",
+  isAuthenticated,
+  catchAsyncErrors(async (req, res, next) => {
+    const { oldPassword, newPassword, confirmPassword } = req.body;
+    const user = await User.findById(req.user.id).select("+password");
+
+    if (!user) {
+      return next(new ErrorHandler("User not found", 400));
+    }
+
+    const isPasswordMatched = await user.comparePassword(oldPassword);
+    if (!isPasswordMatched) {
+      return next(new ErrorHandler("Old password is incorrect!", 400));
+    }
+    if (newPassword !== confirmPassword) {
+      return next(
+        new ErrorHandler("Password doesn't matched with each other!", 400)
+      );
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password updated successfully!",
+    });
   })
 );
 

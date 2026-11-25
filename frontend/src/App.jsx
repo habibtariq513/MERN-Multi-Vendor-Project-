@@ -6,6 +6,7 @@ import store from "./redux/store.js";
 import { loadSeller } from "./redux/actions/seller.js";
 import { getAllProducts } from "./redux/actions/product.js";
 import { getAllEvents } from "./redux/actions/event.js";
+import { loadUser } from "./redux/actions/user.js";
 import {
   ActivationPage,
   BestSellingPage,
@@ -34,6 +35,7 @@ import {
 
 function App() {
   useEffect(() => {
+    store.dispatch(loadUser());
     store.dispatch(loadSeller());
     store.dispatch(getAllProducts());
     store.dispatch(getAllEvents());

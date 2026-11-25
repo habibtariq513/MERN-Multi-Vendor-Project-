@@ -68,7 +68,7 @@ const ProfileSidebar = ({ setActive, active }) => {
     },
     {
       id: 6,
-      label: "Payment methods",
+      label: "Change password",
       icon: <RiLockPasswordLine size={20} />,
       action: () => setActive(6),
     },
