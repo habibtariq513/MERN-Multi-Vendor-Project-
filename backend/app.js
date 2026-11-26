@@ -20,6 +20,7 @@ const shop = require("./controller/shop");
 const product = require("./controller/product");
 const event = require("./controller/event");
 const coupon = require("./controller/coupounCode");
+const order = require("./controller/order");
 
 app.use(express.json());
 app.use(cookieParser());
@@ -37,6 +38,7 @@ app.use("/api/v2/shop", shop);
 app.use("/api/v2/product", product);
 app.use("/api/v2/event", event);
 app.use("/api/v2/coupon", coupon);
+app.use("/api/v2/order", order);
 
 // it's for ErrorHandling
 app.use(ErrorHandler);

@@ -18,6 +18,7 @@ import {
   ProductDetailsPage,
   ProfilePage,
   CheckoutPage,
+  PaymentPage,
   ShopCreatePage,
   SellerActivationPage,
   ShopLoginPage,
@@ -71,6 +72,14 @@ function App() {
         element={
           <ProtectedRoute>
             <CheckoutPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/payment"
+        element={
+          <ProtectedRoute>
+            <PaymentPage />
           </ProtectedRoute>
         }
       />
